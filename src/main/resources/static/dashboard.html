@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Contacts - CallDesk</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+	<aside class="sidebar">
+		<div class="brand">
+			<div class="brand-mark">&#9742;</div>
+			<span>CallDesk</span>
+		</div>
+
+		<a class="nav-link active" href="/dashboard.html">Contacts</a>
+		<a class="nav-link" href="/history.html">Call history</a>
+
+		<div class="sidebar-spacer"></div>
+
+		<div class="sidebar-user">
+			<div class="who" id="who"></div>
+			<button class="btn btn-secondary btn-block" id="logout" type="button">Log out</button>
+		</div>
+	</aside>
+
+	<main class="main">
+
+		<div class="page-head">
+			<div>
+				<h1>Dashboard</h1>
+				<p>Click Call and your phone rings first, then we connect you.</p>
+			</div>
+			<button class="btn btn-primary" id="toggle-add" type="button">+ Add contact</button>
+		</div>
+
+		<div class="msg" id="message" hidden></div>
+
+		<!-- The inbound queue. Shared across agents: whoever gets to it first claims it. -->
+		<section class="card" id="queue-card" style="margin-bottom:20px">
+			<div class="card-head">
+				<h2>Incoming calls
+					<span class="badge badge-neutral" id="queue-count" hidden></span>
+				</h2>
+				<button class="btn btn-secondary" id="refresh-queue" type="button">Refresh</button>
+			</div>
+			<ul class="list" id="queue-list"></ul>
+			<div class="empty" id="queue-empty" hidden>
+				<div class="empty-icon">&#128222;</div>
+				<h3>No incoming calls</h3>
+				<p>When someone rings your Twilio number, they appear here to call back.</p>
+			</div>
+		</section>
+
+		<!-- Hidden until "+ Add contact" is clicked, so the list stays the focus. -->
+		<div class="card card-pad" id="add-panel" hidden style="margin-bottom:20px">
+			<form id="add-form" novalidate>
+				<div class="form-row">
+					<div class="field">
+						<label for="name">Name</label>
+						<input class="input" type="text" id="name" placeholder="John Smith" required>
+					</div>
+					<div class="field">
+						<label for="phoneNumber">Phone number</label>
+						<input class="input" type="tel" id="phoneNumber" placeholder="+1 555 010 2233" required>
+					</div>
+					<button class="btn btn-primary" type="submit" id="add-submit">Save</button>
+				</div>
+				<div class="hint" style="margin-top:10px">
+					Include the country code. Without one, <strong>+1</strong> is assumed.
+				</div>
+			</form>
+		</div>
+
+		<section class="card">
+			<div class="card-head">
+				<h2>Contacts</h2>
+				<form id="dial-form" class="dial-form">
+					<input class="input" type="tel" id="dial-number" placeholder="Or dial any number, e.g. +1 555 010 2233">
+					<button class="btn btn-primary" type="submit" id="dial-submit">Call</button>
+				</form>
+			</div>
+			<ul class="list" id="contact-list"></ul>
+
+			<div class="empty" id="empty" hidden>
+				<div class="empty-icon">&#128100;</div>
+				<h3>No contacts yet</h3>
+				<p>Add someone above, then click Call to reach them.</p>
+			</div>
+		</section>
+
+	</main>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/contacts.js"></script>
+</body>
+</html>

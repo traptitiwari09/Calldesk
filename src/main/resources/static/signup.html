@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Sign up - CallDesk</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="auth-wrap">
+	<div class="auth-card">
+
+		<div class="auth-head">
+			<div class="brand-mark">&#9742;</div>
+			<h1>Create your account</h1>
+			<p>Start calling your contacts from the browser</p>
+		</div>
+
+		<div class="msg" id="message" hidden></div>
+
+		<form id="signup-form" novalidate>
+			<div class="field">
+				<label for="name">Your name</label>
+				<input class="input" type="text" id="name" name="name"
+				       placeholder="Alex Carter" autocomplete="name">
+			</div>
+
+			<div class="field">
+				<label for="email">Email</label>
+				<input class="input" type="email" id="email" name="email"
+				       placeholder="you@example.com" autocomplete="email" required>
+			</div>
+
+			<div class="field">
+				<label for="phoneNumber">Your phone number</label>
+				<input class="input" type="tel" id="phoneNumber" name="phoneNumber"
+				       placeholder="+91 98765 43210" autocomplete="tel" required>
+				<div class="hint">This phone rings first when you place a call, then you get connected to your contact.</div>
+			</div>
+
+			<div class="field">
+				<label for="password">Password</label>
+				<input class="input" type="password" id="password" name="password"
+				       placeholder="At least 8 characters" autocomplete="new-password" required>
+			</div>
+
+			<button class="btn btn-primary btn-block" type="submit" id="submit">Create account</button>
+		</form>
+
+		<div class="auth-foot">
+			Already have an account? <a href="/login.html">Log in</a>
+		</div>
+
+	</div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+</body>
+</html>

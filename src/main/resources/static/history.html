@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Call history - CallDesk</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+	<aside class="sidebar">
+		<div class="brand">
+			<div class="brand-mark">&#9742;</div>
+			<span>CallDesk</span>
+		</div>
+
+		<a class="nav-link" href="/dashboard.html">Contacts</a>
+		<a class="nav-link active" href="/history.html">Call history</a>
+
+		<div class="sidebar-spacer"></div>
+
+		<div class="sidebar-user">
+			<div class="who" id="who"></div>
+			<button class="btn btn-secondary btn-block" id="logout" type="button">Log out</button>
+		</div>
+	</aside>
+
+	<main class="main">
+
+		<div class="page-head">
+			<div>
+				<h1>Call history</h1>
+				<p>Every call this account has placed, newest first.</p>
+			</div>
+			<button class="btn btn-secondary" id="refresh" type="button">Refresh</button>
+		</div>
+
+		<div class="msg" id="message" hidden></div>
+
+		<div class="card">
+			<div class="table-scroll">
+				<table class="table" id="table" hidden>
+					<thead>
+						<tr>
+							<th>Contact</th>
+							<th>Number</th>
+							<th>When</th>
+							<th>Duration</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody id="rows"></tbody>
+				</table>
+			</div>
+
+			<div class="empty" id="empty" hidden>
+				<div class="empty-icon">&#9742;</div>
+				<h3>No calls yet</h3>
+				<p>Calls you place from the Contacts page will show up here.</p>
+			</div>
+		</div>
+
+	</main>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/history.js"></script>
+</body>
+</html>

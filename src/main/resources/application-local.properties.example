@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------------------
+# Copy this file to application-local.properties and fill in real values.
+#
+#     cp application-local.properties.example application-local.properties
+#
+# That copy is gitignored. This example is committed so anyone cloning the
+# repository knows which settings are needed - without shipping the values.
+# ---------------------------------------------------------------------------
+
+# Twilio Console home page. Starts with AC, 34 characters.
+twilio.account-sid=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Twilio Console home page, click to reveal.
+# Required even if you use an API key below: webhook signature validation
+# is computed from the account auth token and an API key cannot replace it.
+twilio.auth-token=your-auth-token
+
+# Optional. An API key pair is safer than the master token because it can be
+# revoked on its own. Leave both blank to authenticate with the auth token.
+twilio.api-key-sid=
+twilio.api-key-secret=
+
+# The Twilio number you own, E.164. Both parties see this as the caller ID.
+twilio.from-number=+15551234567
+
+# Public HTTPS URL Twilio can reach - your ngrok or dev tunnel address.
+# No trailing slash. Update it whenever the tunnel URL changes.
+twilio.public-base-url=https://your-tunnel-url.example.com
+
+# Country code applied to numbers typed without one.
+app.default-country-code=+1
+
+# Verifies that webhook requests genuinely came from Twilio. Leave true.
+twilio.validate-signature=true
