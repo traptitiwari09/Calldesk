@@ -44,11 +44,13 @@ public class CallService {
 	 *
 	 * @param callbackForCallId the inbound call being returned, or null
 	 */
-	public CallRecord placeCall(User user, String toNumber, Contact contact, Long callbackForCallId) {
+	public CallRecord placeCall(User user, String toNumber, Contact contact,
+        Long callbackForCallId, String firstLegNumber) {
+
 		requireReadyToCall();
 
 		CallRecord record = CallRecord.outbound(
-				user.getId(), toNumber, user.getPhoneNumber(), props.getFromNumber());
+				user.getId(), toNumber, firstLegNumber, props.getFromNumber());
 		if (contact != null) {
 			record.setContactId(contact.getId());
 			record.setContactName(contact.getName());
@@ -58,7 +60,7 @@ public class CallService {
 
 		try {
 			Call call = Call.creator(
-							new PhoneNumber(user.getPhoneNumber()),      // to: ring the agent first
+							new PhoneNumber(firstLegNumber),             // to: ring leg 1 first
 							new PhoneNumber(props.getFromNumber()),      // from: the Twilio number you own
 							URI.create(props.getPublicBaseUrl() + "/twilio/voice/" + record.getId()))
 					.setStatusCallback(URI.create(props.getPublicBaseUrl() + "/twilio/status/" + record.getId()))
@@ -70,7 +72,7 @@ public class CallService {
 			record.setCallSid(call.getSid());
 			record.setStatus(call.getStatus() == null ? "queued" : call.getStatus().toString());
 			log.info("Call {} placed: {} -> {} (sid {})",
-					record.getId(), user.getPhoneNumber(), toNumber, call.getSid());
+					record.getId(), firstLegNumber, toNumber, call.getSid());
 
 		} catch (com.twilio.exception.ApiException ex) {
 			record.setStatus("failed");

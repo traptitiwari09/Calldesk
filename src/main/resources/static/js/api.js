@@ -1,6 +1,6 @@
-/* ---------------------------------------------------------------------------
+/*
    Shared helpers. Loaded by every page before its own script.
-   --------------------------------------------------------------------------- */
+    */
 
 /**
  * Calls the backend and unwraps the JSON.

@@ -277,15 +277,38 @@ a:hover { text-decoration: underline; }
 .badge-good { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
 .badge-bad { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
 .badge-neutral { background: var(--surface-alt); color: var(--text-muted); border-color: var(--border-strong); }
+.badge-in { background: var(--accent-soft); color: var(--accent); border-color: #c7d2fe; }
+.badge-out { background: var(--surface-alt); color: var(--text-muted); border-color: var(--border-strong); }
 
-/* -------------------------------------------------------------- empty state */
+.num-link { color: var(--text-faint); padding: 0 2px; }
+
+/* --------------------------------------------------------- direction filter */
+
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filters .btn.active {
+	background: var(--accent-soft);
+	color: var(--accent);
+	border-color: #c7d2fe;
+}
+.filters .btn.active:hover:not(:disabled) { background: var(--accent-soft); }
+.badge-in { background: var(--accent-soft); color: var(--accent); border-color: #c7d2fe; }
+.badge-out { background: var(--surface-alt); color: var(--text-muted); border-color: var(--border-strong); }
+
+.filters { display: flex; gap: 6px; }
+.filters .btn.active {
+	background: var(--accent-soft);
+	color: var(--accent);
+	border-color: #c7d2fe;
+}
+
+/*  empty state */
 
 .empty { padding: 48px 24px; text-align: center; color: var(--text-muted); }
 .empty-icon { font-size: 30px; opacity: .35; }
 .empty h3 { margin: 12px 0 4px; font-size: 16px; font-weight: 600; color: var(--text); }
 .empty p { margin: 0; font-size: 14px; }
 
-/* -------------------------------------------------------------------- table */
+/*  table */
 
 .table { width: 100%; border-collapse: collapse; }
 .table th {
@@ -306,7 +329,7 @@ a:hover { text-decoration: underline; }
 
 .table-scroll { overflow-x: auto; }
 
-/* --------------------------------------------------------------- auth pages */
+/*  auth pages */
 
 .auth-wrap {
 	min-height: 100vh;
@@ -329,7 +352,7 @@ a:hover { text-decoration: underline; }
 .auth-head p { margin: 0; color: var(--text-muted); font-size: 14px; }
 .auth-foot { margin-top: 20px; text-align: center; font-size: 14px; color: var(--text-muted); }
 
-/* -------------------------------------------------------------- responsive */
+/*  responsive */
 
 @media (max-width: 760px) {
 	.app { grid-template-columns: 1fr; }
@@ -349,7 +372,7 @@ a:hover { text-decoration: underline; }
 }
 
 
-/* --- incoming queue + inline dialler ------------------------------------- */
+/*  incoming queue + inline dialler  */
 
 .card-head {
 	display: flex;
@@ -385,4 +408,11 @@ a:hover { text-decoration: underline; }
 
 .muted {
 	color: var(--muted);
+}
+
+
+.head-actions {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
 }

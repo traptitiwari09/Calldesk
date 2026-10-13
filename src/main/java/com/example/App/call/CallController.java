@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/calls")
@@ -42,7 +43,7 @@ public class CallController {
 	}
 
 	
-	public record PlaceCallRequest(Long contactId, String phoneNumber, Long callbackForCallId) {
+	public record PlaceCallRequest(Long contactId, String phoneNumber, Long callbackForCallId, String firstLegNumber) {
 	}
 
 
@@ -54,6 +55,11 @@ public class CallController {
 		String toNumber;
 		Long callbackFor = body.callbackForCallId();
 
+		// Held until the call is actually accepted by Twilio. Claiming it earlier means a
+		// rejected call leaves the caller marked "returned" - out of everyone's queue, and
+		// never rung back. Losing a caller is the exact failure this app exists to prevent.
+		CallRecord inboundToClaim = null;
+
 		if (callbackFor != null) {
 			// Returning a call somebody made to us.
 			CallRecord inbound = calls.findById(callbackFor)
@@ -63,10 +69,7 @@ public class CallController {
 			if (inbound.getContactId() != null) {
 				contact = contacts.findByIdAndUserId(inbound.getContactId(), user.getId()).orElse(null);
 			}
-			
-			inbound.setUserId(user.getId());
-			inbound.setStatus("returned");
-			calls.save(inbound);
+			inboundToClaim = inbound;
 
 		} else if (body.contactId() != null) {
 			contact = contacts.findByIdAndUserId(body.contactId(), user.getId())
@@ -84,7 +87,28 @@ public class CallController {
 			throw new ApiException("Pick someone to call, or type a number");
 		}
 
-		return describe(callService.placeCall(user, toNumber, contact, callbackFor));
+		// Leg 1 defaults to the agent's own phone, so the dashboard and the callback
+		// queue - which never send this field - keep working unchanged.
+		String firstLeg = (body.firstLegNumber() == null || body.firstLegNumber().isBlank())
+				? user.getPhoneNumber()
+				: PhoneNumbers.toE164(body.firstLegNumber(), defaultCountryCode);
+
+		// Twilio would ring the number, then try to dial it again while it is busy:
+		// leg 2 fails and leg 1 is billed for nothing.
+		if (firstLeg.equals(toNumber)) {
+			throw new ApiException("Both numbers are the same - pick two different people");
+		}
+
+		CallRecord placed = callService.placeCall(user, toNumber, contact, callbackFor, firstLeg);
+
+		// Only now is the caller genuinely being rung back, so only now leave the queue.
+		if (inboundToClaim != null) {
+			inboundToClaim.setUserId(user.getId());
+			inboundToClaim.setStatus("returned");
+			calls.save(inboundToClaim);
+		}
+
+		return describe(placed);
 	}
 
 	
@@ -97,13 +121,25 @@ public class CallController {
 	}
 
 	
-	@GetMapping
-	public List<Map<String, Object>> history(HttpServletRequest request) {
+		@GetMapping
+	public List<Map<String, Object>> history(
+			@RequestParam(required = false) String direction,
+			HttpServletRequest request) {
 		User user = currentUser.require(request);
-		return calls.findTop100ByUserIdOrderByCreatedAtDesc(user.getId()).stream()
-				.map(CallController::describe)
-				.toList();
+
+		// Filtering in the query rather than in the browser: the list is capped at
+		// 100 rows, so a client-side filter would silently drop older calls of the direction
+		
+		List<CallRecord> found = switch (direction == null ? "ALL" : direction.toUpperCase()) {
+			case "ALL" -> calls.findTop100ByUserIdOrDirectionOrderByCreatedAtDesc(user.getId(), "INBOUND");
+			case "OUTBOUND" -> calls.findTop100ByUserIdAndDirectionOrderByCreatedAtDesc(user.getId(), "OUTBOUND");
+			case "INBOUND" -> calls.findTop100ByDirectionOrderByCreatedAtDesc("INBOUND");
+			default -> throw new ApiException("Unknown direction: " + direction);
+		};
+
+		return found.stream().map(CallController::describe).toList();
 	}
+
 
 	
 	@GetMapping("/{id}")
@@ -127,6 +163,15 @@ public class CallController {
 		out.put("callbackForCallId", record.getCallbackForCallId());
 		out.put("toNumber", record.getToNumber());
 		out.put("displayNumber", PhoneNumbers.forDisplay(record.getToNumber()));
+
+		// Both ends of the call. Outbound bridges the agent's phone to the other party;
+		// inbound is the caller reaching our Twilio number (nobody is bridged in - it queues).
+		String from = record.isInbound() ? record.getToNumber() : record.getAgentNumber();
+		String to = record.isInbound() ? record.getTwilioNumber() : record.getToNumber();
+		out.put("agentNumber", record.getAgentNumber());
+		out.put("fromNumber", from);
+		out.put("displayFrom", PhoneNumbers.forDisplay(from));
+		out.put("displayTo", PhoneNumbers.forDisplay(to));
 		out.put("status", record.getStatus());
 		out.put("finished", record.isFinished());
 		out.put("durationSeconds", record.getDurationSeconds());
