@@ -34,10 +34,37 @@
 				<h1>Dashboard</h1>
 				<p>Click Call and your phone rings first, then we connect you.</p>
 			</div>
-			<button class="btn btn-primary" id="toggle-add" type="button">+ Add contact</button>
+			<div class="head-actions">
+				<button class="btn btn-secondary" id="toggle-bridge" type="button">Connect two people</button>
+				<button class="btn btn-primary" id="toggle-add" type="button">+ Add contact</button>
+			</div>
 		</div>
 
 		<div class="msg" id="message" hidden></div>
+
+		<!--
+			Connect two other people to each other. Neither has to be the agent, and
+			neither needs to be a saved contact - the app rings the first number, and
+			when that person answers, dials the second and bridges them.
+		-->
+		<div class="card card-pad" id="bridge-panel" hidden style="margin-bottom:20px">
+			<form id="bridge-form" novalidate>
+				<div class="form-row">
+					<div class="field">
+						<label for="bridge-first">First person <span class="muted">(rings first)</span></label>
+						<input class="input" type="tel" id="bridge-first" placeholder="+91 98765 43210" required>
+					</div>
+					<div class="field">
+						<label for="bridge-second">Second person</label>
+						<input class="input" type="tel" id="bridge-second" placeholder="+91 98765 01234" required>
+					</div>
+					<button class="btn btn-primary" type="submit" id="bridge-submit">Connect</button>
+				</div>
+				<div class="hint" style="margin-top:10px">
+					CONNECT
+				</div>
+			</form>
+		</div>
 
 		<!-- The inbound queue. Shared across agents: whoever gets to it first claims it. -->
 		<section class="card" id="queue-card" style="margin-bottom:20px">

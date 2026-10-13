@@ -1,13 +1,13 @@
-/* ---------------------------------------------------------------------------
+/* 
    dashboard.html - list contacts, add and delete them, and place calls.
-   --------------------------------------------------------------------------- */
+    */
 
 const message = document.getElementById('message');
 const list = document.getElementById('contact-list');
 const empty = document.getElementById('empty');
 const addPanel = document.getElementById('add-panel');
 
-/* --------------------------------------------------------------- page setup */
+/* page setup */
 
 (async function start() {
 	const user = await requireLogin();
@@ -18,7 +18,7 @@ const addPanel = document.getElementById('add-panel');
 	await loadContacts();
 }());
 
-/* ------------------------------------------------------------ rendering */
+/*  rendering */
 
 async function loadContacts() {
 	try {
@@ -59,7 +59,7 @@ function rowHtml(contact) {
 		</li>`;
 }
 
-/* ------------------------------------------------------------ placing a call */
+/*  placing a call */
 
 async function placeCall(button) {
 	showMessage(message, '');
@@ -77,7 +77,7 @@ async function placeCall(button) {
 	});
 }
 
-/* ----------------------------------------------------------- add and delete */
+/*  add and delete */
 
 document.getElementById('toggle-add').addEventListener('click', () => {
 	addPanel.hidden = !addPanel.hidden;
@@ -119,12 +119,12 @@ async function deleteContact(button) {
 }
 
 
-/* ---------------------------------------------------------------------------
+/* 
    Incoming call queue.
 
    Shared across every agent - an inbound call belongs to the business, not to
    whoever happens to be logged in. First agent to click Call back claims it.
-   --------------------------------------------------------------------------- */
+    */
 
 const queueList = document.getElementById('queue-list');
 const queueEmpty = document.getElementById('queue-empty');
@@ -177,7 +177,7 @@ queueList.addEventListener('click', async (event) => {
 	await withBusy(button, 'Calling...', async () => {
 		try {
 			const call = await apiPost('/api/calls', { callbackForCallId: Number(button.dataset.callback) });
-			showMessage(message, `Calling ${call.displayName} - answer your phone.`, 'ok');
+			showMessage(message, `Calling ${call.displayName} - answer your phone.`, 'success');
 			await loadQueue();
 		} catch (error) {
 			showMessage(message, error.message);
@@ -197,7 +197,7 @@ document.getElementById('dial-form').addEventListener('submit', async (event) =>
 	await withBusy(button, 'Calling...', async () => {
 		try {
 			const call = await apiPost('/api/calls', { phoneNumber: input.value });
-			showMessage(message, `Calling ${call.displayName} - answer your phone.`, 'ok');
+			showMessage(message, `Calling ${call.displayName} - answer your phone.`, 'success');
 			input.value = '';
 		} catch (error) {
 			showMessage(message, error.message);
@@ -206,3 +206,49 @@ document.getElementById('dial-form').addEventListener('submit', async (event) =>
 });
 
 loadQueue();
+
+
+/* 
+   Connect two people to each other.
+
+   Same endpoint as every other call - the only difference is that firstLegNumber
+   is supplied, so the app rings that number instead of the agent's own phone.
+   Omit it and the server falls back to the agent, which is what the dial box and
+   the callback queue rely on.
+    */
+
+const bridgePanel = document.getElementById('bridge-panel');
+
+document.getElementById('toggle-bridge').addEventListener('click', () => {
+	bridgePanel.hidden = !bridgePanel.hidden;
+	if (!bridgePanel.hidden) document.getElementById('bridge-first').focus();
+});
+
+document.getElementById('bridge-form').addEventListener('submit', async (event) => {
+	event.preventDefault();
+
+	const first = document.getElementById('bridge-first');
+	const second = document.getElementById('bridge-second');
+
+	if (!second.value.trim()) {
+		showMessage(message, 'Enter the number for the second person.');
+		return;
+	}
+
+	const button = document.getElementById('bridge-submit');
+	await withBusy(button, 'Connecting...', async () => {
+		try {
+			const call = await apiPost('/api/calls', {
+				phoneNumber: second.value,
+				// Blank means "ring me" - the server applies that default.
+				firstLegNumber: first.value.trim() || null,
+			});
+			const who = first.value.trim() || 'your phone';
+			showMessage(message, `Ringing ${who} - once answered, ${call.displayNumber} is dialled.`, 'success');
+			first.value = '';
+			second.value = '';
+		} catch (error) {
+			showMessage(message, error.message);
+		}
+	});
+});

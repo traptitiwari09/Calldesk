@@ -29,13 +29,19 @@
 
 	<main class="main">
 
-		<div class="page-head">
+				<div class="page-head">
 			<div>
 				<h1>Call history</h1>
-				<p>Every call this account has placed, newest first.</p>
+				<p>Every call on this account, incoming and outgoing, newest first.</p>
 			</div>
-			<button class="btn btn-secondary" id="refresh" type="button">Refresh</button>
+			<div class="filters" id="filters">
+				<button class="btn btn-secondary active" type="button" data-direction="ALL">All</button>
+				<button class="btn btn-secondary" type="button" data-direction="INBOUND">Incoming</button>
+				<button class="btn btn-secondary" type="button" data-direction="OUTBOUND">Outgoing</button>
+				<button class="btn btn-secondary" id="refresh" type="button">Refresh</button>
+			</div>
 		</div>
+
 
 		<div class="msg" id="message" hidden></div>
 
@@ -43,13 +49,15 @@
 			<div class="table-scroll">
 				<table class="table" id="table" hidden>
 					<thead>
-						<tr>
+												<tr>
+							<th>Direction</th>
 							<th>Contact</th>
-							<th>Number</th>
+							<th>Numbers</th>
 							<th>When</th>
 							<th>Duration</th>
 							<th>Status</th>
 						</tr>
+
 					</thead>
 					<tbody id="rows"></tbody>
 				</table>
